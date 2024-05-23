@@ -1,0 +1,55 @@
+SQL> create table employee(eid int primary key,
+ename varchar(10),
+address varchar(10),
+supeid int,
+dno int);
+SQL> alter table employeee add constraint fk_supeid foreign
+key(supeid) references employeee(eid));
+SQL> create table department(dno int primary key,
+dname varchar(20),
+dlocation varchar(10),
+mgrid int references employeee(eid));
+SQL> alter table employeee add constraint fk_dno foreign key(dno)
+references department(dno));
+SQL> create table project(pno int primary key,
+pname varchar(20),
+plocation varchar(20),
+dno int references department(dno));
+SQL> create table dependent(name varchar(20),
+gender varchar(6),
+age int,
+addr varchar(20),
+eid int references employeee(eid),
+primary key(name,eid));
+SQL> create table empproj(eid int references employeee(eid),
+pno int references project(pno),
+hpw int,
+primary key(eid,pno));
+Nagesh B S, Asst. Prof., Dept. of MCA, RNSIT, Bengaluru phone:9844032238
+SQL> create table empphno(eid int references employeee(eid),
+phno int,
+primary key(eid,phno));
+
+
+Query 1. select * from employee where eid in(select w1.eid from
+empproj w1,empproj w2 where w1.pno=5 and w2.pno=10 and
+w1.eid=w2.eid);
+
+Query 2. select * from employee where eid in(select eid from
+dependent group by eid having count(eid)>=2);
+ 
+Query 3. select pname from project where pno in(select pno from
+empproj group by pno having count(pno)=(select max(count(pno)) from
+empproj group by pno))
+
+Query 4. select * from employee where eid not in (select eid from
+dependent);
+ 
+
+Query 5. select * from employee where eid in(select eid from empproj
+group by eid having sum(hpw)= 2 (select max(sum(hpw)) from empproj
+group by eid));
+ 
+Query 6.
+create view empcount(dno,no_of_emp) as select dno,count(dno) from
+employeee group by dno;
